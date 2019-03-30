@@ -25,7 +25,7 @@ def send_telegram_message(title, url):
     print(title)
     print(url)
     msg = "New Listing found!\n" + title + "\n" + url
-    bot.send_message(chat_id=415531944, text=msg)
+    bot.send_message(chat_id=config.get('bot1', 'chatid'), text=msg)
 
 # main loop that checks for new posts containing our keywords
 while 1:
