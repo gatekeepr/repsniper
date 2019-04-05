@@ -20,7 +20,7 @@ def send_telegram_message(title, url):
     print(title)
     print(url)
     msg = "New Listing found!\n" + title + "\n" + url
-    bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
+    # bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
 
 
 # main loop that checks for new posts containing our keywords
@@ -39,7 +39,7 @@ while 1:
         trigger = False
 
     # call message fn if its an european listing and hasnt been sent yet
-    if trigger is not True and "US" or "CAN" or "AUS" not in recent:
+    if trigger is not True and "US" not in recent and "CAN" not in recent and "AUS" not in recent:
         trigger = True
         send_telegram_message(recent, url)
     time.sleep(1)
