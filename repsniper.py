@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import praw
 import pdb
 import re
@@ -39,7 +39,8 @@ while 1:
         trigger = False
 
     # call message fn if its an european listing and hasnt been sent yet
-    if trigger is not True and "US" not in recent and "CAN" not in recent and "AUS" not in recent:
+    check = recent.upper()
+    if trigger is not True and "[US]" not in check and "[USA]" not in check and "[CAN]" not in check and "[AUS]" not in check and "[ASIA]" not in check:
         trigger = True
         send_telegram_message(recent, url)
-    time.sleep(3)
+    time.sleep(10)
