@@ -26,20 +26,27 @@ def send_telegram_message(title, url):
 # main loop that checks for new posts containing our keywords
 while 1:
     # get recent submission
-    for submission in subreddit.new(limit=1):
-        recent = submission.title
-        url = submission.url
-
-    # check if new post available and reset variables
-    if latest not in recent:
+    try:
         for submission in subreddit.new(limit=1):
             recent = submission.title
             url = submission.url
-        latest = recent
-        trigger = False
 
-    # call message fn if its an european listing and hasnt been sent yet
-    if trigger is not True and "US" not in recent and "CAN" not in recent and "AUS" not in recent:
-        trigger = True
-        send_telegram_message(recent, url)
-    time.sleep(1)
+        # check if new post available and reset variables
+        if latest not in recent:
+            for submission in subreddit.new(limit=1):
+                recent = submission.title
+                url = submission.url
+            latest = recent
+            trigger = False
+
+        # call message fn if its an european listing and hasnt been sent yet
+        if trigger is not True and "US" not in recent and "CAN" not in recent and "AUS" not in recent:
+            trigger = True
+            send_telegram_message(recent, url)
+
+    except praw.requests.exceptions.HTTPError as e:
+        msg = "HTTPError(" + str(e.errno) + "): " + str(e.strerror)
+        print(msg)
+        pass
+        
+    time.sleep(10)
