@@ -18,8 +18,8 @@ bot = telegram.Bot(token=config.get('bot1', 'telegram'))
 
 # notifies the user with a telegram message
 def send_telegram_message(title, url):
-    print(title)
-    print(url)
+    #print(title)
+    #print(url)
     msg = "New Listing found!\n" + title + "\n" + url
     bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
 
