@@ -6,7 +6,7 @@ import os
 import time
 import telegram
 import configparser
-import urllib2
+import urllib.error
 
 # load configurations
 config = configparser.ConfigParser()
@@ -45,15 +45,15 @@ while 1:
             trigger = True
             send_telegram_message(recent, url)
     # catch exceptions when reddit is down
-    except urllib2.HTTPError, e:
+    except urllib.error.HTTPError as e:
         if e.code in [429, 500, 502, 503, 504]:
-            print "Reddit is down (error %s), sleeping..." % e.code
+            print("Reddit is down (error %s), sleeping..." + e.code)
             time.sleep(60)
             pass
         else:
             raise
     # catch every other exception
-    except Exception, e:
-        print "Not a HTTP Exception, ERROR: %s" % str(e)
+    except Exception as e:
+        print("Not a HTTP Exception, ERROR:" + str(e))
         raise
     time.sleep(10)
