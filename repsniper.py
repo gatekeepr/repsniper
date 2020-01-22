@@ -15,13 +15,16 @@ reddit = praw.Reddit('bot1')
 subreddit = reddit.subreddit("FashionRepsBST")
 latest = "empty"
 bot = telegram.Bot(token=config.get('bot1', 'telegram'))
+filterwords = ["[US]", "[USA]", "[CAN]", "[ASIA]", "[AUS]"]
+triggerwords = []
 
 # notifies the user with a telegram message
-def send_telegram_message(title, url):
-    #print(title)
-    #print(url)
+def send_telegram_message(title, url, isRare):
     msg = "New Listing found!\n" + title + "\n" + url
-    bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
+    if(isRare):
+        bot.send_message(chat_id=config.get('bot1', 'chatid'), text=msg)
+    else:
+        bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
 
 
 # main loop that checks for new posts containing our keywords
@@ -31,29 +34,33 @@ while 1:
         for submission in subreddit.new(limit=1):
             recent = submission.title
             url = submission.url
+    except:
+        print("Exception occured!")
+
         # check if new post available and reset variables
         if latest not in recent:
-            for submission in subreddit.new(limit=1):
-                recent = submission.title
-                url = submission.url
+            try:
+                for submission in subreddit.new(limit=1):
+                    recent = submission.title
+                    url = submission.url
+            except:
+                print("Exception occured!")
             latest = recent
             trigger = False
+            relevant = True
 
-        # call message fn if its an european listing and hasnt been sent yet
+        # do some filtering to see if the listing is relevant
         check = recent.upper()
-        if trigger is not True and "[US]" not in check and "[USA]" not in check and "[CAN]" not in check and "[AUS]" not in check and "[ASIA]" not in check:
-            trigger = True
-            send_telegram_message(recent, url)
-    # catch exceptions when reddit is down
-    except urllib.error.HTTPError as e:
-        if e.code in [429, 500, 502, 503, 504]:
-            print("Reddit is down (error %s), sleeping..." + e.code)
-            time.sleep(60)
-            pass
-        else:
-            raise
-    # catch every other exception
-    except Exception as e:
-        print("Not a HTTP Exception, ERROR:" + str(e))
-        raise
+        for word in filterwords:
+            if word in check:
+                relevant = False
+                break
+        if relevant and not trigger:
+            for word in triggerwords:
+                if word in check:
+                    send_telegram_message(recent, url, True)
+                    trigger = True
+                    break
+            send_telegram_message(recent,url, False)
+
     time.sleep(10)
