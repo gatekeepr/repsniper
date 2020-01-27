@@ -66,5 +66,6 @@ while 1:
                 break
         # print("normal message")
         send_telegram_message(recent,url, False)
+        trigger = True
     # print("nothing found this run...")
     time.sleep(10)
