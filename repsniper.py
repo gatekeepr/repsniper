@@ -21,10 +21,13 @@ triggerwords = ["NUPTSE", "TNF"]
 # notifies the user with a telegram message
 def send_telegram_message(title, url, isRare):
     msg = "New Listing found!\n" + title + "\n" + url
-    if(isRare):
-        bot.send_message(chat_id=config.get('bot1', 'chatid'), text=msg)
-    else:
-        bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
+    try:
+        if(isRare):
+            bot.send_message(chat_id=config.get('bot1', 'chatid'), text=msg)
+        else:
+            bot.send_message(chat_id=config.get('bot1', 'groupchatid'), text=msg)
+    except:
+        print("Failed to send message")
 
 
 # main loop that checks for new posts containing our keywords
@@ -35,7 +38,7 @@ while 1:
             recent = submission.title
             url = submission.url
     except:
-        print("Exception occured!")
+        print("Reddit down/Rate limited!")
 
     # check if new post available and reset variables
     if latest not in recent:
@@ -47,25 +50,21 @@ while 1:
             trigger = False
             relevant = True
         except:
-            print("Exception occured!")
+            print("Reddit down/Rate limited!")
 
 
     # do some filtering to see if the listing is relevant
     check = recent.upper()
     for word in filterwords:
         if word in check:
-            # print("not relevant")
             relevant = False
             break
     if relevant and not trigger:
         for word in triggerwords:
             if word in check:
-                # print("important message")
                 send_telegram_message(recent, url, True)
                 trigger = True
                 break
-        # print("normal message")
         send_telegram_message(recent,url, False)
         trigger = True
-    # print("nothing found this run...")
     time.sleep(10)
